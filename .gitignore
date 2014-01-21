@@ -1,4 +1,6 @@
 *.class
+/conveyor.iml
+/.idea
 
 # Package Files #
 *.jar
