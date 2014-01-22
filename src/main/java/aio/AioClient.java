@@ -3,7 +3,6 @@ package aio;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
 
 public class AioClient {
 

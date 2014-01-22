@@ -1,7 +1,12 @@
 package serialization;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.ByteBufferInput;
+import com.esotericsoftware.kryo.io.ByteBufferOutput;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+
+import java.nio.ByteBuffer;
 
 /*
  * Copyright 2014 Yang Fan.
@@ -18,19 +23,31 @@ import com.esotericsoftware.kryo.io.Output;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class Ser {
+public class KryoSerializer implements Serializer {
 
     private Kryo k = new Kryo();
 
-    private Output out = new Output(1024);
+    private ByteBufferOutput out = new ByteBufferOutput();
+
+    private ByteBufferInput in = new ByteBufferInput();
 
     public byte[] ser(Object obj) {
         byte [] result = null;
         if (obj != null) {
             k.writeObject(out, obj);
         }
-
         return result;
     }
 
+    @Override
+    public Object deser(ByteBuffer inBuffer) {
+        in.setBuffer(inBuffer, 0, inBuffer.position());
+        return k.readClassAndObject(in);
+    }
+
+    @Override
+    public void ser(ByteBuffer outBuffer, Object obj) {
+        out.setBuffer(outBuffer, outBuffer.limit());
+        k.writeClassAndObject(out, obj);
+    }
 }

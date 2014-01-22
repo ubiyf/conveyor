@@ -1,5 +1,10 @@
 package aio;
 
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -19,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AioServer {
 
     private static final String DEFAULT_NAME_PREFIX = "Aio-server-";
+
+    public static final int MAX_ACCPETED_CLIENT = 1024;
 
     private static final AtomicInteger AIO_SERVER_COUNTER = new AtomicInteger();
 
