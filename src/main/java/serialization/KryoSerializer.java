@@ -1,10 +1,12 @@
 package serialization;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.ByteBufferOutput;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import m.Ping;
 
 import java.nio.ByteBuffer;
 
@@ -23,16 +25,26 @@ import java.nio.ByteBuffer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Not thread safe
+ */
 public class KryoSerializer implements Serializer {
 
-    private Kryo k = new Kryo();
+    private final Kryo k;
 
-    private ByteBufferOutput out = new ByteBufferOutput();
+    private final ByteBufferOutput out;
 
-    private ByteBufferInput in = new ByteBufferInput();
+    private final ByteBufferInput in;
+
+    public KryoSerializer() {
+        k = new Kryo();
+        out = new ByteBufferOutput();
+        in = new ByteBufferInput();
+    }
 
     public byte[] ser(Object obj) {
-        byte [] result = null;
+        byte[] result = null;
         if (obj != null) {
             k.writeObject(out, obj);
         }

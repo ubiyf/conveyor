@@ -1,7 +1,4 @@
-package m;
-
-import java.util.ArrayList;
-import java.util.List;
+package protocol;
 
 /*
  * Copyright 2014 Yang Fan.
@@ -18,13 +15,5 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class MessageClassScanner {
-
-    private static List<Class> classes = new ArrayList<>();
-
-    static {
-
-    }
-
-
+public interface NetworkMessage {
 }

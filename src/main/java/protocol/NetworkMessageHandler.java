@@ -1,7 +1,6 @@
-package m;
+package protocol;
 
-import java.util.ArrayList;
-import java.util.List;
+import aio.AioClient;
 
 /*
  * Copyright 2014 Yang Fan.
@@ -18,13 +17,8 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class MessageClassScanner {
+public interface NetworkMessageHandler<T extends NetworkMessage> {
 
-    private static List<Class> classes = new ArrayList<>();
-
-    static {
-
-    }
-
+    void handle(T msg, AioClient client);
 
 }
