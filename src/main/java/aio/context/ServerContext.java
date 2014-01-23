@@ -1,4 +1,5 @@
-package decode;
+package aio.context;
+
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -14,22 +15,5 @@ package decode;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import com.lmax.disruptor.EventFactory;
-
-public class DecodeEventFactory implements EventFactory<DecodeEvent> {
-
-    private static final DecodeEventFactory INSTANCE = new DecodeEventFactory();
-
-    public static DecodeEventFactory getInstance() {
-        return INSTANCE;
-    }
-
-    private DecodeEventFactory() {
-    }
-
-    @Override
-    public DecodeEvent newInstance() {
-        return new DecodeEvent();
-    }
+public interface ServerContext {
 }

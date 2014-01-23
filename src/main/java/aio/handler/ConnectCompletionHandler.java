@@ -1,4 +1,4 @@
-package decode;
+package aio.handler;
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -15,21 +15,28 @@ package decode;
  * limitations under the License.
  */
 
-import com.lmax.disruptor.EventFactory;
+import aio.AioClient;
 
-public class DecodeEventFactory implements EventFactory<DecodeEvent> {
+import java.nio.channels.CompletionHandler;
 
-    private static final DecodeEventFactory INSTANCE = new DecodeEventFactory();
+public class ConnectCompletionHandler implements CompletionHandler<Void, AioClient> {
 
-    public static DecodeEventFactory getInstance() {
+    private static final ConnectCompletionHandler INSTANCE = new ConnectCompletionHandler();
+
+    private ConnectCompletionHandler() {
+    }
+
+    public static ConnectCompletionHandler getInstance() {
         return INSTANCE;
     }
 
-    private DecodeEventFactory() {
+    @Override
+    public void completed(Void result, AioClient attachment) {
+
     }
 
     @Override
-    public DecodeEvent newInstance() {
-        return new DecodeEvent();
+    public void failed(Throwable exc, AioClient attachment) {
+
     }
 }

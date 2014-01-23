@@ -1,7 +1,4 @@
 package protocol;
-
-import aio.AioClient;
-
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -17,6 +14,9 @@ import aio.AioClient;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import aio.AioClient;
+
 public interface NetworkMessageHandler<T extends NetworkMessage> {
 
     void handle(T msg, AioClient client);

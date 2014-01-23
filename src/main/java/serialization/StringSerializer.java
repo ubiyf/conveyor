@@ -1,11 +1,4 @@
 package serialization;
-
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -21,31 +14,29 @@ import java.nio.charset.CharsetEncoder;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Not thread safe
- */
+
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+
 public class StringSerializer implements Serializer {
 
-    private static final String CHARSET_NAME = "UTF-8";
+    private static final StringSerializer INSTANCE = new StringSerializer();
 
-    private final Charset charset;
+    public static StringSerializer getInstance() {
+        return INSTANCE;
+    }
 
-    private final CharsetDecoder decoder;
-
-    private final CharsetEncoder encoder;
-
-    public StringSerializer() {
-        charset = Charset.forName(CHARSET_NAME);
-        decoder = charset.newDecoder();
-        encoder = charset.newEncoder();
+    private StringSerializer() {
     }
 
     @Override
-    public Object deser(ByteBuffer inBuffer) {
+    public Object toObject(ByteBuffer inBuffer) {
         CharBuffer charBuffer = null;
         try {
             inBuffer.flip();
-
+            CharsetDecoder decoder = StringThreadLocal.getLocalDecoder();
             charBuffer = decoder.decode(inBuffer);
             return charBuffer.toString();
         } catch (Exception ex) {
@@ -55,9 +46,10 @@ public class StringSerializer implements Serializer {
     }
 
     @Override
-    public void ser(ByteBuffer outBuffer, Object obj) {
+    public void toByte(ByteBuffer outBuffer, Object obj) {
         CharBuffer charBuffer = CharBuffer.wrap(obj.toString());
         try {
+            CharsetEncoder encoder = StringThreadLocal.getLocalEncoder();
             encoder.encode(charBuffer, outBuffer, true);
             outBuffer.flip();
         } catch (Exception ex) {

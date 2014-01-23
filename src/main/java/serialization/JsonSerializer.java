@@ -1,7 +1,4 @@
 package serialization;
-
-import java.nio.ByteBuffer;
-
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -17,14 +14,17 @@ import java.nio.ByteBuffer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.nio.ByteBuffer;
+
 public class JsonSerializer implements Serializer {
     @Override
-    public Object deser(ByteBuffer inBuffer) {
+    public Object toObject(ByteBuffer inBuffer) {
         return null;
     }
 
     @Override
-    public void ser(ByteBuffer outBuffer, Object obj) {
+    public void toByte(ByteBuffer outBuffer, Object obj) {
 
     }
 }

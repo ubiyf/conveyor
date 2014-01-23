@@ -1,4 +1,5 @@
-package decode;
+package aio.context;
+
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -15,21 +16,27 @@ package decode;
  * limitations under the License.
  */
 
-import com.lmax.disruptor.EventFactory;
+import aio.AioServer;
 
-public class DecodeEventFactory implements EventFactory<DecodeEvent> {
+import java.nio.channels.AsynchronousServerSocketChannel;
 
-    private static final DecodeEventFactory INSTANCE = new DecodeEventFactory();
+public final class AcceptContext {
 
-    public static DecodeEventFactory getInstance() {
-        return INSTANCE;
+    private AioServer server;
+
+    private AsynchronousServerSocketChannel listeningChannel;
+
+    public AcceptContext(AioServer server, AsynchronousServerSocketChannel listeningChannel) {
+        this.server = server;
+        this.listeningChannel = listeningChannel;
     }
 
-    private DecodeEventFactory() {
+    public AioServer getServer() {
+        return server;
     }
 
-    @Override
-    public DecodeEvent newInstance() {
-        return new DecodeEvent();
+    public AsynchronousServerSocketChannel getListeningChannel() {
+        return listeningChannel;
     }
+
 }

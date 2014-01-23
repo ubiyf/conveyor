@@ -1,15 +1,4 @@
 package serialization;
-
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Registration;
-import com.esotericsoftware.kryo.io.ByteBufferInput;
-import com.esotericsoftware.kryo.io.ByteBufferOutput;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import m.Ping;
-
-import java.nio.ByteBuffer;
-
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -26,40 +15,49 @@ import java.nio.ByteBuffer;
  * limitations under the License.
  */
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.ByteBufferInput;
+import com.esotericsoftware.kryo.io.ByteBufferOutput;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 /**
- * Not thread safe
+ * thread safe for multi-threads, adopt thread local variable.
+ * NOTICE:
+ * before invoke toObject and toByte method
+ * please set the Kryo message package name at first
+ * otherwise it will throw a
  */
 public class KryoSerializer implements Serializer {
 
-    private final Kryo k;
+    private static final KryoSerializer INSTANCE = new KryoSerializer();
 
-    private final ByteBufferOutput out;
-
-    private final ByteBufferInput in;
-
-    public KryoSerializer() {
-        k = new Kryo();
-        out = new ByteBufferOutput();
-        in = new ByteBufferInput();
+    public static KryoSerializer getInstance() {
+        return INSTANCE;
     }
 
-    public byte[] ser(Object obj) {
-        byte[] result = null;
-        if (obj != null) {
-            k.writeObject(out, obj);
-        }
-        return result;
+    private KryoSerializer() {
+    }
+
+    public static void registerKryoClasses(String kryoMessagePackageName) throws IOException, ClassNotFoundException {
+        KryoThreadLocal.initRegistration(kryoMessagePackageName);
     }
 
     @Override
-    public Object deser(ByteBuffer inBuffer) {
+    public Object toObject(ByteBuffer inBuffer) {
+        Kryo k = KryoThreadLocal.getLocalKryo();
+        ByteBufferInput in = KryoThreadLocal.getLocalInput();
         in.setBuffer(inBuffer, 0, inBuffer.position());
         return k.readClassAndObject(in);
     }
 
     @Override
-    public void ser(ByteBuffer outBuffer, Object obj) {
+    public void toByte(ByteBuffer outBuffer, Object obj) {
+        Kryo k = KryoThreadLocal.getLocalKryo();
+        ByteBufferOutput out = KryoThreadLocal.getLocalOutput();
         out.setBuffer(outBuffer, outBuffer.limit());
         k.writeClassAndObject(out, obj);
     }
+
 }

@@ -1,4 +1,4 @@
-package decode;
+package aio;
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -15,21 +15,8 @@ package decode;
  * limitations under the License.
  */
 
-import com.lmax.disruptor.EventFactory;
+public interface ConnectableClientFactory {
 
-public class DecodeEventFactory implements EventFactory<DecodeEvent> {
+    AioClient newConnectableClient();
 
-    private static final DecodeEventFactory INSTANCE = new DecodeEventFactory();
-
-    public static DecodeEventFactory getInstance() {
-        return INSTANCE;
-    }
-
-    private DecodeEventFactory() {
-    }
-
-    @Override
-    public DecodeEvent newInstance() {
-        return new DecodeEvent();
-    }
 }

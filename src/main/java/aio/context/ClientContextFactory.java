@@ -1,7 +1,4 @@
-package m;
-
-import java.util.ArrayList;
-import java.util.List;
+package aio.context;
 
 /*
  * Copyright 2014 Yang Fan.
@@ -18,13 +15,8 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class MessageClassScanner {
+public interface ClientContextFactory<T extends ClientContext> {
 
-    private static List<Class> classes = new ArrayList<>();
-
-    static {
-
-    }
-
+    T newClientContext();
 
 }

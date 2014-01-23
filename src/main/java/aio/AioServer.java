@@ -1,9 +1,24 @@
 package aio;
+/*
+ * Copyright 2014 Yang Fan.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.WaitStrategy;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
+import aio.context.*;
+import aio.handler.AcceptCompletionHandler;
+import serialization.Serializer;
+import serialization.StringSerializer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,11 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Use default channel group
- * The thread quantity of default channel group equals to the processor quantity
- */
-public class AioServer {
+public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
 
     private static final String DEFAULT_NAME_PREFIX = "Aio-server-";
 
@@ -35,9 +46,22 @@ public class AioServer {
 
     private int port;
 
-    private List<AsynchronousServerSocketChannel> listeningChnls;
+    private List<AsynchronousServerSocketChannel> listeningChannels;
 
-    public AioServer(String name, int port) throws IOException{
+    private Serializer serializer;
+
+    private SC serverContext;
+
+    private ClientContextFactory<ACC> acceptableClientContextFactory;
+
+    // TODO customize io monitor thread quantity
+    // TODO customize io monitor thread factory
+    // TODO customize compute thread quantity
+    // TODO customize compute thread factory
+    // TODO customize connectable client thread quantity
+    // TODO customize connectable client thread factory
+    // TODO customize client context factory
+    public AioServer(String name, int port, Serializer serializer, SC serverContext, ClientContextFactory<ACC> acceptableClientContextFactory) throws IOException {
         channelGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                 Executors.defaultThreadFactory());
         if (null == name) {
@@ -46,16 +70,20 @@ public class AioServer {
             this.name = name;
         }
         this.port = port;
+        this.serializer = serializer;
+        this.serverContext = serverContext;
+        this.acceptableClientContextFactory = acceptableClientContextFactory;
     }
 
     public void start() throws IOException {
         List<InetAddress> ipv4Address = IpUtils.getIpv4Address();
-        listeningChnls = new ArrayList<>(ipv4Address.size());
+        listeningChannels = new ArrayList<>(ipv4Address.size());
         for (InetAddress ip : ipv4Address) {
             System.out.println(ip);
             InetSocketAddress socketAddress = new InetSocketAddress(ip, port);
             AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open().bind(socketAddress);
-            listener.accept(listener, AcceptCompletionHandler.getInstance());
+            // TODO set socket option
+            listener.accept(new AcceptContext(this, listener), AcceptCompletionHandler.getInstance());
         }
     }
 
@@ -68,10 +96,34 @@ public class AioServer {
         return DEFAULT_NAME_PREFIX + AIO_SERVER_COUNTER.addAndGet(1);
     }
 
-    public static void main(String [] args) throws InterruptedException, IOException {
+    public Serializer getSerializer() {
+        return serializer;
+    }
+
+    public AsynchronousChannelGroup getChannelGroup() {
+        return channelGroup;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public List<AsynchronousServerSocketChannel> getListeningChannels() {
+        return listeningChannels;
+    }
+
+    public SC getServerContext() {
+        return serverContext;
+    }
+
+    public static void main(String[] args) throws InterruptedException, IOException {
         CountDownLatch latch = new CountDownLatch(1);
-        AioServer server = new AioServer("test", 9999);
-        server.start();
+        AioServer<DefaultServerContext, DefaultClientContext> echoServer = new AioServer("test", 9999, StringSerializer.getInstance(), new DefaultServerContext(), new DefaultClientContextFactory());
+        echoServer.start();
         latch.await();
     }
 
