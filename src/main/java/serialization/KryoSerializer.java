@@ -60,4 +60,9 @@ public class KryoSerializer implements Serializer {
         k.writeClassAndObject(out, obj);
     }
 
+    public <T> T copy(T obj) {
+        Kryo k = KryoThreadLocal.getLocalKryo();
+        return k.copy(obj);
+    }
+
 }
