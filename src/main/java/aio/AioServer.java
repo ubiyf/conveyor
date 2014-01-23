@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
+public class AioServer {
 
     private static final String DEFAULT_NAME_PREFIX = "Aio-server-";
 
@@ -50,9 +50,7 @@ public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
 
     private Serializer serializer;
 
-    private SC serverContext;
-
-    private ClientContextFactory<ACC> acceptableClientContextFactory;
+    private ServerContext serverContext;
 
     // TODO customize io monitor thread quantity
     // TODO customize io monitor thread factory
@@ -61,7 +59,7 @@ public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
     // TODO customize connectable client thread quantity
     // TODO customize connectable client thread factory
     // TODO customize client context factory
-    public AioServer(String name, int port, Serializer serializer, SC serverContext, ClientContextFactory<ACC> acceptableClientContextFactory) throws IOException {
+    public AioServer(String name, int port, Serializer serializer, ServerContext serverContext) throws IOException {
         channelGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                 Executors.defaultThreadFactory());
         if (null == name) {
@@ -72,7 +70,6 @@ public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
         this.port = port;
         this.serializer = serializer;
         this.serverContext = serverContext;
-        this.acceptableClientContextFactory = acceptableClientContextFactory;
     }
 
     public void start() throws IOException {
@@ -116,13 +113,13 @@ public class AioServer<SC extends ServerContext, ACC extends ClientContext> {
         return listeningChannels;
     }
 
-    public SC getServerContext() {
+    public ServerContext getServerContext() {
         return serverContext;
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
         CountDownLatch latch = new CountDownLatch(1);
-        AioServer<DefaultServerContext, DefaultClientContext> echoServer = new AioServer("test", 9999, StringSerializer.getInstance(), new DefaultServerContext(), new DefaultClientContextFactory());
+        AioServer echoServer = new AioServer("test", 9999, StringSerializer.getInstance(), null);
         echoServer.start();
         latch.await();
     }

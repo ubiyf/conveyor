@@ -26,7 +26,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 
-public class AioClient<CC extends ClientContext> {
+public class AioClient {
 
     private AsynchronousSocketChannel clientChannel;
 
@@ -38,9 +38,9 @@ public class AioClient<CC extends ClientContext> {
 
     private boolean connectable;
 
-    private CC clientContext;
+    private ClientContext clientContext;
 
-    public AioClient(AsynchronousSocketChannel clientChannel, Serializer serializer, CC clientContext, boolean connectable) {
+    public AioClient(AsynchronousSocketChannel clientChannel, Serializer serializer, ClientContext clientContext, boolean connectable) {
         this.clientChannel = clientChannel;
         this.readBuffer = ByteBufferPool.getBufferFromPool();
         this.writeBuffer = ByteBufferPool.getBufferFromPool();
@@ -113,7 +113,7 @@ public class AioClient<CC extends ClientContext> {
         return writeBuffer;
     }
 
-    public CC getClientContext() {
+    public ClientContext getClientContext() {
         return clientContext;
     }
 

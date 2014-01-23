@@ -18,7 +18,7 @@ package serialization;
 import java.nio.ByteBuffer;
 
 /**
- * Thread safe and singleton
+ * The implementation of this interface must be thread safe and singleton
  */
 public interface Serializer {
 

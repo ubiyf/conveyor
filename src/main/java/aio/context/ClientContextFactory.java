@@ -15,8 +15,8 @@ package aio.context;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface ClientContextFactory<T extends ClientContext> {
+public interface ClientContextFactory {
 
-    T newClientContext();
+    ClientContext newClientContext();
 
 }

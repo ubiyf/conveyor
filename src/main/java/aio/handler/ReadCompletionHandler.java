@@ -54,6 +54,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, AioClie
     public void completed(Integer result, AioClient client) {
         checkConnection(result, client);
         ByteBuffer bb = client.getReadBuffer();
+        client.getClientContext();
         decodeDisruptor.publishEvent(DecodeEventTranslator.getInstance(), client);
     }
 
