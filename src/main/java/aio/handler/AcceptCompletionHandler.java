@@ -17,6 +17,8 @@ package aio.handler;
 
 import aio.AioClient;
 import aio.context.AcceptContext;
+import aio.context.ClientContext;
+import serialization.KryoSerializer;
 
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -47,7 +49,9 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
     }
 
     private void onNewClient(AsynchronousSocketChannel clientChnl, AcceptContext context) {
-        AioClient c = new AioClient(clientChnl, context.getServer().getSerializer(), null, false);
+        ClientContext sampleClientContext = context.getServer().getAccpetedClientContext();
+        ClientContext clientContext = KryoSerializer.getInstance().copy(sampleClientContext);
+        AioClient c = new AioClient(clientChnl, context.getServer().getSerializer(), clientContext, false);
         System.out.println(clientChnl.toString());
         c.readSysCall();
     }

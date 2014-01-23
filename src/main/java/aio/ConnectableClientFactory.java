@@ -15,8 +15,21 @@ package aio;
  * limitations under the License.
  */
 
-public interface ConnectableClientFactory {
+import aio.context.ClientContext;
+import serialization.KryoSerializer;
+import serialization.Serializer;
 
-    AioClient newConnectableClient();
+import java.nio.channels.AsynchronousSocketChannel;
 
+public class ConnectableClientFactory {
+
+    private ClientContext connectableClientContext;
+
+    public ConnectableClientFactory(ClientContext connectableClientContext) {
+        this.connectableClientContext = connectableClientContext;
+    }
+
+    public AioClient newConnectableClient(AsynchronousSocketChannel clientChannel, Serializer serializer) {
+        return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true);
+    }
 }

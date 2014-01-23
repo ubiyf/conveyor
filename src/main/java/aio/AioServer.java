@@ -52,6 +52,8 @@ public class AioServer {
 
     private ServerContext serverContext;
 
+    private ClientContext accpetedClientContext;
+
     // TODO customize io monitor thread quantity
     // TODO customize io monitor thread factory
     // TODO customize compute thread quantity
@@ -115,6 +117,14 @@ public class AioServer {
 
     public ServerContext getServerContext() {
         return serverContext;
+    }
+
+    public ClientContext getAccpetedClientContext() {
+        return accpetedClientContext;
+    }
+
+    public void setAccpetedClientContext(ClientContext accpetedClientContext) {
+        this.accpetedClientContext = accpetedClientContext;
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
