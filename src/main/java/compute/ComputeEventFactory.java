@@ -18,6 +18,15 @@ package compute;
 import com.lmax.disruptor.EventFactory;
 
 public class ComputeEventFactory implements EventFactory<ComputeEvent> {
+
+    private static final ComputeEventFactory INSTANCE = new ComputeEventFactory();
+
+    private ComputeEventFactory() {}
+
+    public static ComputeEventFactory getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public ComputeEvent newInstance() {
         return new ComputeEvent();

@@ -48,8 +48,11 @@ public class KryoSerializer implements Serializer {
     public Object toObject(ByteBuffer inBuffer) {
         Kryo k = KryoThreadLocal.getLocalRegisteredKryo();
         ByteBufferInput in = KryoThreadLocal.getLocalInput();
+        inBuffer.flip();
         in.setBuffer(inBuffer, 0, inBuffer.position());
-        return k.readClassAndObject(in);
+        Object o = k.readClassAndObject(in);
+        inBuffer.clear();
+        return o;
     }
 
     @Override

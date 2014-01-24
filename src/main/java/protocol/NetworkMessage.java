@@ -1,5 +1,7 @@
 package protocol;
 
+import aio.AioClient;
+
 /*
  * Copyright 2014 Yang Fan.
  *
@@ -16,4 +18,7 @@ package protocol;
  * limitations under the License.
  */
 public interface NetworkMessage {
+
+    void process(AioClient client);
+
 }

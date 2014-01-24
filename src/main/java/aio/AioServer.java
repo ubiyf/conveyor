@@ -19,14 +19,19 @@ import aio.context.AcceptContext;
 import aio.context.ClientContext;
 import aio.context.ServerContext;
 import aio.handler.AcceptCompletionHandler;
+import aio.handler.ReadCompletionHandler;
+import aio.handler.WriteCompletionHandler;
+import compute.ComputeEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import protocol.NetworkMessageHandler;
 import serialization.Serializer;
 import serialization.StringSerializer;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.util.ArrayList;
@@ -54,20 +59,15 @@ public class AioServer {
 
     private List<AsynchronousServerSocketChannel> listeningChannels;
 
-    private Serializer serializer;
-
     private ServerContext serverContext;
 
-    private ClientContext accpetedClientContext;
+    private final AcceptableClientFactory acceptableClientFactory;
 
     // TODO customize io monitor thread quantity
     // TODO customize io monitor thread factory
     // TODO customize compute thread quantity
     // TODO customize compute thread factory
-    // TODO customize connectable client thread quantity
-    // TODO customize connectable client thread factory
-    // TODO customize client context factory
-    public AioServer(String name, int port, Serializer serializer, ServerContext serverContext) throws IOException {
+    public AioServer(String name, int port, Serializer serializer, ServerContext serverContext, ClientContext accpetedClientContext) throws IOException {
         channelGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                 Executors.defaultThreadFactory());
         if (null == name) {
@@ -76,19 +76,32 @@ public class AioServer {
             this.name = name;
         }
         this.port = port;
-        this.serializer = serializer;
         this.serverContext = serverContext;
+        this.acceptableClientFactory = new AcceptableClientFactory(accpetedClientContext, serializer, new ReadCompletionHandler(), new WriteCompletionHandler());
+    }
+
+    public AioServer(String name, int port, Serializer serializer, ServerContext serverContext) throws IOException {
+        this(name, port, serializer, serverContext, null);
+    }
+
+    public AioServer(String name, int port, Serializer serializer) throws IOException {
+        this(name, port, serializer, null);
+    }
+
+    public AioServer(String name, int port) throws IOException {
+        this(name, port, StringSerializer.getInstance());
     }
 
     public void start() throws IOException {
         List<InetAddress> ipv4Address = IpUtils.getIpv4Address();
         listeningChannels = new ArrayList<>(ipv4Address.size());
+        AcceptCompletionHandler acceptCompletionHandler = new AcceptCompletionHandler();
         for (InetAddress ip : ipv4Address) {
             logger.debug(ip.toString());
             InetSocketAddress socketAddress = new InetSocketAddress(ip, port);
             AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open().bind(socketAddress);
             // TODO set socket option
-            listener.accept(new AcceptContext(this, listener), AcceptCompletionHandler.getInstance());
+            listener.accept(new AcceptContext(this, listener), acceptCompletionHandler);
         }
     }
 
@@ -99,10 +112,6 @@ public class AioServer {
 
     private String getDefaultName() {
         return DEFAULT_NAME_PREFIX + AIO_SERVER_COUNTER.addAndGet(1);
-    }
-
-    public Serializer getSerializer() {
-        return serializer;
     }
 
     public AsynchronousChannelGroup getChannelGroup() {
@@ -125,19 +134,31 @@ public class AioServer {
         return serverContext;
     }
 
-    public ClientContext getAccpetedClientContext() {
-        return accpetedClientContext;
+    public AcceptableClientFactory getAcceptableClientFactory() {
+        return acceptableClientFactory;
     }
 
-    public void setAccpetedClientContext(ClientContext accpetedClientContext) {
-        this.accpetedClientContext = accpetedClientContext;
+    public void registerNetworkMessageHandler(Class clazz, NetworkMessageHandler handler) {
+        ComputeEventHandler.getInstance().registerNetworkMessageHandler(clazz, handler);
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
         CountDownLatch latch = new CountDownLatch(1);
-        AioServer echoServer = new AioServer("test", 9999, StringSerializer.getInstance(), null);
+        AioServer echoServer = new AioServer("test", 9999);
+        echoServer.registerNetworkMessageHandler(String.class, new StringMessageEchoHandler());
         echoServer.start();
         latch.await();
     }
 
+    private static class StringMessageEchoHandler implements NetworkMessageHandler<String> {
+
+        private final Logger logger = LoggerFactory.getLogger(StringMessageEchoHandler.class);
+
+        @Override
+        public void handle(String msg, AioClient client) {
+            logger.debug(msg);
+            client.writeNetworkMessage(msg);
+            client.writeSysCall();
+        }
+    }
 }

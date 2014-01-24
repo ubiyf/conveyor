@@ -53,4 +53,7 @@ public final class IpUtils {
         return IPV4_ADDRESS;
     }
 
+    public static String getLocalAddress() {
+        return LOCAL_ADDRESS;
+    }
 }

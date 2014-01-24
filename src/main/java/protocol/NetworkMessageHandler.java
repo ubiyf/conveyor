@@ -17,7 +17,7 @@ package protocol;
 
 import aio.AioClient;
 
-public interface NetworkMessageHandler<T extends NetworkMessage> {
+public interface NetworkMessageHandler<T> {
 
     void handle(T msg, AioClient client);
 

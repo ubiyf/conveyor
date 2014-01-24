@@ -38,7 +38,8 @@ public class StringSerializer implements Serializer {
             inBuffer.flip();
             CharsetDecoder decoder = StringThreadLocal.getLocalDecoder();
             charBuffer = decoder.decode(inBuffer);
-            return charBuffer.toString();
+            String s = charBuffer.toString();
+            return s;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

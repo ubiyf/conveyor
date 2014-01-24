@@ -22,15 +22,6 @@ import java.nio.channels.CompletionHandler;
 
 public class ConnectCompletionHandler implements CompletionHandler<Void, AioClient> {
 
-    private static final ConnectCompletionHandler INSTANCE = new ConnectCompletionHandler();
-
-    private ConnectCompletionHandler() {
-    }
-
-    public static ConnectCompletionHandler getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public void completed(Void result, AioClient attachment) {
 

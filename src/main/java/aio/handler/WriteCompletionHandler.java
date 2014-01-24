@@ -21,19 +21,9 @@ import java.nio.channels.CompletionHandler;
 
 public class WriteCompletionHandler implements CompletionHandler<Integer, AioClient> {
 
-    private static final WriteCompletionHandler INSTANCE = new WriteCompletionHandler();
-
-    private WriteCompletionHandler() {
-    }
-
-    public static WriteCompletionHandler getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public void completed(Integer result, AioClient client) {
         checkConnection(result, client);
-        client.clearWriteBuffer();
         client.readSysCall();
     }
 

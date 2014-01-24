@@ -19,6 +19,15 @@ import aio.AioClient;
 import com.lmax.disruptor.EventTranslatorOneArg;
 
 public class ComputeEventTranslator implements EventTranslatorOneArg<ComputeEvent, AioClient> {
+
+    private static final ComputeEventTranslator INSTANCE = new ComputeEventTranslator();
+
+    private ComputeEventTranslator() {}
+
+    public static  ComputeEventTranslator getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void translateTo(ComputeEvent event, long sequence, AioClient client) {
         event.setClient(client);

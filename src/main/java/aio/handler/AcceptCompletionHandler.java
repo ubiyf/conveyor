@@ -15,6 +15,7 @@ package aio.handler;
  * limitations under the License.
  */
 
+import aio.AcceptableClientFactory;
 import aio.AioClient;
 import aio.context.AcceptContext;
 import aio.context.ClientContext;
@@ -30,15 +31,6 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
 
     private static final Logger logger = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 
-    private static final AcceptCompletionHandler INSTANCE = new AcceptCompletionHandler();
-
-    private AcceptCompletionHandler() {
-    }
-
-    public static AcceptCompletionHandler getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public void completed(AsynchronousSocketChannel clientChannel, AcceptContext context) {
         // accept next connect request
@@ -52,11 +44,16 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
     public void failed(Throwable exc, AcceptContext context) {
     }
 
-    private void onNewClient(AsynchronousSocketChannel clientChnl, AcceptContext context) {
-        ClientContext sampleClientContext = context.getServer().getAccpetedClientContext();
-        ClientContext clientContext = KryoSerializer.getInstance().copy(sampleClientContext);
-        AioClient c = new AioClient(clientChnl, context.getServer().getSerializer(), clientContext, false);
-        logger.debug(clientChnl.toString());
+    /**
+     * Server is always passive, when accepts a new client
+     * it will initiate a read system call and waiting for client action
+     * @param clientChannel the socket channel connected to the remote client
+     * @param context the accept action context
+     */
+    private void onNewClient(AsynchronousSocketChannel clientChannel, AcceptContext context) {
+        AcceptableClientFactory factory = context.getServer().getAcceptableClientFactory();
+        AioClient c = factory.newAcceptableClient(clientChannel);
+        logger.debug(clientChannel.toString());
         c.readSysCall();
     }
 }

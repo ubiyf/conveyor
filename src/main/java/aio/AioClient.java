@@ -28,30 +28,43 @@ import java.nio.channels.AsynchronousSocketChannel;
 
 public class AioClient {
 
-    private AsynchronousSocketChannel clientChannel;
+    private final AsynchronousSocketChannel clientChannel;
 
     private ByteBuffer readBuffer;
 
     private ByteBuffer writeBuffer;
 
-    private Serializer serializer;
+    private final Serializer serializer;
 
-    private boolean connectable;
+    private final boolean connectable;
 
-    private ClientContext clientContext;
+    private final ClientContext clientContext;
 
-    public AioClient(AsynchronousSocketChannel clientChannel, Serializer serializer, ClientContext clientContext, boolean connectable) {
+    private final ConnectCompletionHandler connectCompletionHandler;
+
+    private final ReadCompletionHandler readCompletionHandler;
+
+    private final WriteCompletionHandler writeCompletionHandler;
+
+    private boolean read;
+
+    private Object inputNetworkMessage;
+
+    public AioClient(AsynchronousSocketChannel clientChannel, Serializer serializer, ClientContext clientContext, boolean connectable, ConnectCompletionHandler connectCompletionHandler, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) {
         this.clientChannel = clientChannel;
         this.readBuffer = ByteBufferPool.getBufferFromPool();
         this.writeBuffer = ByteBufferPool.getBufferFromPool();
         this.serializer = serializer;
         this.connectable = connectable;
         this.clientContext = clientContext;
+        this.connectCompletionHandler = connectCompletionHandler;
+        this.readCompletionHandler = readCompletionHandler;
+        this.writeCompletionHandler = writeCompletionHandler;
     }
 
     public void connectSysCall(SocketAddress remoteServerAddress) {
         if (connectable) {
-            clientChannel.connect(remoteServerAddress, this, ConnectCompletionHandler.getInstance());
+            clientChannel.connect(remoteServerAddress, this, connectCompletionHandler);
         } else {
             throw new RuntimeException("Can not connect to remote server, this client is created by server socket accept.");
         }
@@ -61,14 +74,14 @@ public class AioClient {
      * Just tell OS that I want to read
      */
     public void readSysCall() {
-        clientChannel.read(readBuffer, this, ReadCompletionHandler.getInstance());
+        clientChannel.read(readBuffer, this, readCompletionHandler);
     }
 
     /**
      * Just tell OS that I want to write
      */
     public void writeSysCall() {
-        clientChannel.write(writeBuffer, this, WriteCompletionHandler.getInstance());
+        clientChannel.write(writeBuffer, this, writeCompletionHandler);
     }
 
     public void shutdown() {
@@ -87,13 +100,13 @@ public class AioClient {
         returnByteBuffer(writeBuffer);
     }
 
-    public void clearWriteBuffer() {
+    private void clearWriteBuffer() {
         if (writeBuffer != null) {
             writeBuffer.clear();
         }
     }
 
-    public void clearReadBuffer() {
+    private void clearReadBuffer() {
         if (readBuffer != null) {
             readBuffer.clear();
         }
@@ -105,19 +118,20 @@ public class AioClient {
         }
     }
 
-    public ByteBuffer getReadBuffer() {
-        return readBuffer;
-    }
-
-    public ByteBuffer getWriteBuffer() {
-        return writeBuffer;
-    }
-
     public ClientContext getClientContext() {
         return clientContext;
     }
 
-    public Serializer getSerializer() {
-        return serializer;
+    public Object readNetworkMessage() {
+        if (!read) {
+            inputNetworkMessage = serializer.toObject(readBuffer);
+            clearReadBuffer();
+        }
+        return  inputNetworkMessage;
+    }
+
+    public void writeNetworkMessage(Object msg) {
+        clearWriteBuffer();
+        serializer.toByte(writeBuffer, msg);
     }
 }

@@ -16,6 +16,9 @@ package aio;
  */
 
 import aio.context.ClientContext;
+import aio.handler.ConnectCompletionHandler;
+import aio.handler.ReadCompletionHandler;
+import aio.handler.WriteCompletionHandler;
 import serialization.KryoSerializer;
 import serialization.Serializer;
 
@@ -32,14 +35,23 @@ public class ConnectableClientFactory {
 
     private final Serializer serializer;
 
-    public ConnectableClientFactory(ClientContext connectableClientContext, Serializer serializer) throws IOException {
+    private final ConnectCompletionHandler connectCompletionHandler;
+
+    private final ReadCompletionHandler readCompletionHandler;
+
+    private final WriteCompletionHandler writeCompletionHandler;
+
+    public ConnectableClientFactory(ClientContext connectableClientContext, Serializer serializer, ConnectCompletionHandler connectCompletionHandler, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) throws IOException {
         this.connectableClientContext = connectableClientContext;
         this.serializer = serializer;
+        this.connectCompletionHandler = connectCompletionHandler;
+        this.readCompletionHandler = readCompletionHandler;
+        this.writeCompletionHandler = writeCompletionHandler;
         this.connectableClientGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(), Executors.defaultThreadFactory());
     }
 
     public AioClient newConnectableClient() throws IOException {
         AsynchronousSocketChannel clientChannel = AsynchronousSocketChannel.open(connectableClientGroup);
-        return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true);
+        return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true, connectCompletionHandler, readCompletionHandler, writeCompletionHandler);
     }
 }
