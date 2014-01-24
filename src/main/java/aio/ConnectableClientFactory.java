@@ -19,17 +19,27 @@ import aio.context.ClientContext;
 import serialization.KryoSerializer;
 import serialization.Serializer;
 
+import java.io.IOException;
+import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.concurrent.Executors;
 
 public class ConnectableClientFactory {
 
-    private ClientContext connectableClientContext;
+    private final ClientContext connectableClientContext;
 
-    public ConnectableClientFactory(ClientContext connectableClientContext) {
+    private final AsynchronousChannelGroup connectableClientGroup;
+
+    private final Serializer serializer;
+
+    public ConnectableClientFactory(ClientContext connectableClientContext, Serializer serializer) throws IOException {
         this.connectableClientContext = connectableClientContext;
+        this.serializer = serializer;
+        this.connectableClientGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(), Executors.defaultThreadFactory());
     }
 
-    public AioClient newConnectableClient(AsynchronousSocketChannel clientChannel, Serializer serializer) {
+    public AioClient newConnectableClient() throws IOException {
+        AsynchronousSocketChannel clientChannel = AsynchronousSocketChannel.open(connectableClientGroup);
         return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true);
     }
 }
