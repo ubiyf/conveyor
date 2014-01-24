@@ -1,10 +1,27 @@
 package log;
 
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
+
 import java.util.Date;
+import java.util.concurrent.Executors;
 
 public class AioLogger {
 	
 	private String loggerName;
+
+    private static final Disruptor<AioLogEvent> logDisruptor = new Disruptor<>(
+            AioLogEventFactory.getInstance(),
+            AioLoggerConfig.getLogMsgBufferSize(),
+            Executors.newFixedThreadPool(1),
+            ProducerType.MULTI,
+            new BlockingWaitStrategy());
+
+    static {
+        logDisruptor.handleEventsWith(AioLogEventHandler.getInstance());
+        logDisruptor.start();
+    }
 
 	public AioLogger(String loggerName) {
 		super();
@@ -13,7 +30,7 @@ public class AioLogger {
 	
 	public void writeLog(String logMsg, AioLoggerLevel level) {
 		String detailMsg = addLogPrefix(logMsg, level);
-		AioLogMsg wrappedMsg = new AioLogMsg(detailMsg);
+        logDisruptor.publishEvent(AioLogEventTransaltor.getInstance(), detailMsg);
 	}
 	
 	public String getName() {

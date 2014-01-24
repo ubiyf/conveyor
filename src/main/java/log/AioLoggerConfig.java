@@ -9,11 +9,13 @@ public class AioLoggerConfig {
 	
 	private static int fileSize = 100 * 1024 * 1024;
 	
-	private static String fileNamePrefix = "nb-logger";
+	private static String fileNamePrefix = "aio-logger";
 	
 	private static boolean enableConsole = true;
 	
 	private static boolean enableFile = true;
+
+    private static int logMsgBufferSize = 1024;
 	
 	public static void loadConfig(String configFileName) {
 		Properties properties = new Properties();
@@ -42,6 +44,10 @@ public class AioLoggerConfig {
 			if ("false".equals(fileStr)) {
 				enableFile = false;
 			}
+            String msgBufferStr = properties.getProperty("log_msg_buffer_size");
+            if (!isBlankString(msgBufferStr)) {
+                logMsgBufferSize = Integer.parseInt(msgBufferStr);
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Error("load conf failed:" + configFileName);
@@ -75,4 +81,8 @@ public class AioLoggerConfig {
 	public static boolean isEnableFile() {
 		return enableFile;
 	}
+
+    public static int getLogMsgBufferSize() {
+        return logMsgBufferSize;
+    }
 }

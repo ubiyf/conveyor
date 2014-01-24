@@ -15,8 +15,12 @@ package aio;
  * limitations under the License.
  */
 
-import aio.context.*;
+import aio.context.AcceptContext;
+import aio.context.ClientContext;
+import aio.context.ServerContext;
 import aio.handler.AcceptCompletionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import serialization.Serializer;
 import serialization.StringSerializer;
 
@@ -33,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AioServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(AioServer.class);
 
     private static final String DEFAULT_NAME_PREFIX = "Aio-server-";
 
@@ -78,7 +84,7 @@ public class AioServer {
         List<InetAddress> ipv4Address = IpUtils.getIpv4Address();
         listeningChannels = new ArrayList<>(ipv4Address.size());
         for (InetAddress ip : ipv4Address) {
-            System.out.println(ip);
+            logger.debug(ip.toString());
             InetSocketAddress socketAddress = new InetSocketAddress(ip, port);
             AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open().bind(socketAddress);
             // TODO set socket option

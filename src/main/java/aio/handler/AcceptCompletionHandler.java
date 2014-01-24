@@ -18,6 +18,8 @@ package aio.handler;
 import aio.AioClient;
 import aio.context.AcceptContext;
 import aio.context.ClientContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import serialization.KryoSerializer;
 
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -25,6 +27,8 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSocketChannel, AcceptContext> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 
     private static final AcceptCompletionHandler INSTANCE = new AcceptCompletionHandler();
 
@@ -52,7 +56,7 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
         ClientContext sampleClientContext = context.getServer().getAccpetedClientContext();
         ClientContext clientContext = KryoSerializer.getInstance().copy(sampleClientContext);
         AioClient c = new AioClient(clientChnl, context.getServer().getSerializer(), clientContext, false);
-        System.out.println(clientChnl.toString());
+        logger.debug(clientChnl.toString());
         c.readSysCall();
     }
 }
