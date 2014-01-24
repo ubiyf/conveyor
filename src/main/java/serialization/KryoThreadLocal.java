@@ -99,7 +99,11 @@ class KryoThreadLocal {
         for (File directory : dirs) {
             findClasses(directory, packageName);
         }
-        scanned = true;
+        if (CLASSES.size() > 0) {
+            scanned = true;
+        } else {
+            throw new RuntimeException("No classes found in specified package " + packageName);
+        }
     }
 
     private static void findClasses(File directory, String packageName) throws ClassNotFoundException {
