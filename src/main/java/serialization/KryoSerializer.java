@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
  * NOTICE:
  * before invoke toObject and toByte method
  * please set the Kryo message package name at first
- * otherwise it will throw a
+ * otherwise it will throw a runtime exception
  */
 public class KryoSerializer implements Serializer {
 
