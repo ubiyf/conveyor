@@ -28,7 +28,9 @@ import java.util.List;
 
 class KryoThreadLocal {
 
-    private static final ThreadLocal<Kryo> LOCAL_KRYO = new ThreadLocal<>();
+    private static final ThreadLocal<Kryo> LOCAL_REGISTED_KRYO = new ThreadLocal<>();
+
+    private static final ThreadLocal<Kryo> LOCAL_DEFAULT_KRYO = new ThreadLocal<>();
 
     private static final ThreadLocal<ByteBufferInput> LOCAL_INPUT = new ThreadLocal<>();
 
@@ -38,16 +40,25 @@ class KryoThreadLocal {
 
     private static boolean scanned = false;
 
-    public static Kryo getLocalKryo() {
-        Kryo k = LOCAL_KRYO.get();
+    public static Kryo getLocalRegisteredKryo() {
+        Kryo k = LOCAL_REGISTED_KRYO.get();
         if (k == null) {
             if (scanned) {
                 k = new Kryo();
                 registerClasses(k);
-                LOCAL_KRYO.set(k);
+                LOCAL_REGISTED_KRYO.set(k);
             } else {
                 throw new RuntimeException("Has not specify a Kryo message package, please invoke KryoSerializer.registerKryoClasses(String packageName) at first.");
             }
+        }
+        return k;
+    }
+
+    public static Kryo getLocalDefaultKryo() {
+        Kryo k = LOCAL_DEFAULT_KRYO.get();
+        if (k == null) {
+            k = new Kryo();
+            LOCAL_DEFAULT_KRYO.set(k);
         }
         return k;
     }

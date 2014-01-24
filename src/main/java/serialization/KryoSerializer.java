@@ -46,7 +46,7 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public Object toObject(ByteBuffer inBuffer) {
-        Kryo k = KryoThreadLocal.getLocalKryo();
+        Kryo k = KryoThreadLocal.getLocalRegisteredKryo();
         ByteBufferInput in = KryoThreadLocal.getLocalInput();
         in.setBuffer(inBuffer, 0, inBuffer.position());
         return k.readClassAndObject(in);
@@ -54,14 +54,14 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public void toByte(ByteBuffer outBuffer, Object obj) {
-        Kryo k = KryoThreadLocal.getLocalKryo();
+        Kryo k = KryoThreadLocal.getLocalRegisteredKryo();
         ByteBufferOutput out = KryoThreadLocal.getLocalOutput();
         out.setBuffer(outBuffer, outBuffer.limit());
         k.writeClassAndObject(out, obj);
     }
 
     public <T> T copy(T obj) {
-        Kryo k = KryoThreadLocal.getLocalKryo();
+        Kryo k = KryoThreadLocal.getLocalDefaultKryo();
         return k.copy(obj);
     }
 
