@@ -99,7 +99,7 @@ public class AioServer {
         for (InetAddress ip : ipv4Address) {
             logger.debug(ip.toString());
             InetSocketAddress socketAddress = new InetSocketAddress(ip, port);
-            AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open().bind(socketAddress);
+            AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open(channelGroup).bind(socketAddress);
             // TODO set socket option
             listener.accept(new AcceptContext(this, listener), acceptCompletionHandler);
         }
