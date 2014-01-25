@@ -23,7 +23,9 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, AioCli
 
     @Override
     public void completed(Integer result, AioClient client) {
-        checkConnection(result, client);
+        if (result == null || result < 0) {
+            client.destroy();
+        }
     }
 
     @Override
@@ -31,9 +33,4 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, AioCli
         client.destroy();
     }
 
-    private void checkConnection(Integer result, AioClient client) {
-        if (result == null || result.intValue() < 0) {
-            client.destroy();
-        }
-    }
 }

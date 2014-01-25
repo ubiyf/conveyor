@@ -54,7 +54,10 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, AioClie
 
     @Override
     public void completed(Integer result, AioClient client) {
-        checkConnection(result, client);
+        if (result == null || result < 0) {
+            client.destroy();
+            return;
+        }
         client.getClientContext();
         int hashCode = client.hashCode();
         int index = hashCode % Runtime.getRuntime().availableProcessors();
@@ -68,9 +71,4 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, AioClie
         client.destroy();
     }
 
-    private void checkConnection(Integer result, AioClient client) {
-        if (result == null || result.intValue() < 0) {
-            client.destroy();
-        }
-    }
 }
