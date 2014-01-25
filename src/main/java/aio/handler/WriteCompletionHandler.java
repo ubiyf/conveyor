@@ -24,7 +24,6 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, AioCli
     @Override
     public void completed(Integer result, AioClient client) {
         checkConnection(result, client);
-        client.readSysCall();
     }
 
     @Override

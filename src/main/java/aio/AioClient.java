@@ -127,11 +127,17 @@ public class AioClient {
             inputNetworkMessage = serializer.toObject(readBuffer);
             clearReadBuffer();
         }
+        readSysCall();
         return  inputNetworkMessage;
     }
 
     public void writeNetworkMessage(Object msg) {
         clearWriteBuffer();
         serializer.toByte(writeBuffer, msg);
+    }
+
+    @Override
+    public int hashCode() {
+        return clientChannel.hashCode();
     }
 }

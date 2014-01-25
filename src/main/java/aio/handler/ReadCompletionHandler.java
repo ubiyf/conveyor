@@ -24,30 +24,42 @@ import compute.ComputeEvent;
 import compute.ComputeEventFactory;
 import compute.ComputeEventHandler;
 import compute.ComputeEventTranslator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, AioClient> {
 
-    private final Disruptor<ComputeEvent> computeDisruptor;
+    private static final Logger logger = LoggerFactory.getLogger(ReadCompletionHandler.class);
+
+    private final List<Disruptor<ComputeEvent>> computeDisruptors = new ArrayList<>(Runtime.getRuntime().availableProcessors());
 
     public ReadCompletionHandler() {
-        computeDisruptor = new Disruptor<>(
-                ComputeEventFactory.getInstance(),
-                AioServer.MAX_ACCPETED_CLIENT,
-                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-                ProducerType.MULTI,
-                new BlockingWaitStrategy());
-        computeDisruptor.handleEventsWith(ComputeEventHandler.getInstance());
-        computeDisruptor.start();
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            Disruptor<ComputeEvent> computeDisruptor = new Disruptor<>(
+                    ComputeEventFactory.getInstance(),
+                    AioServer.MAX_ACCPETED_CLIENT,
+                    Executors.newSingleThreadExecutor(),
+                    ProducerType.MULTI,
+                    new BlockingWaitStrategy());
+            computeDisruptor.handleEventsWith(ComputeEventHandler.getInstance());
+            computeDisruptor.start();
+            computeDisruptors.add(computeDisruptor);
+        }
     }
 
     @Override
     public void completed(Integer result, AioClient client) {
         checkConnection(result, client);
         client.getClientContext();
+        int hashCode = client.hashCode();
+        int index = hashCode % Runtime.getRuntime().availableProcessors();
+        logger.debug(hashCode + " " + index);
+        Disruptor<ComputeEvent> computeDisruptor = computeDisruptors.get(index);
         computeDisruptor.publishEvent(ComputeEventTranslator.getInstance(), client);
     }
 

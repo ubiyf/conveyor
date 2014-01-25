@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import serialization.KryoSerializer;
 
+import java.io.IOException;
+import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -42,6 +44,7 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
 
     @Override
     public void failed(Throwable exc, AcceptContext context) {
+        logger.debug(exc.getMessage());
     }
 
     /**
@@ -51,6 +54,11 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
      * @param context the accept action context
      */
     private void onNewClient(AsynchronousSocketChannel clientChannel, AcceptContext context) {
+        try {
+            clientChannel.setOption(StandardSocketOptions.TCP_NODELAY, true);
+        } catch (IOException e) {
+            logger.debug(e.getMessage());
+        }
         AcceptableClientFactory factory = context.getServer().getAcceptableClientFactory();
         AioClient c = factory.newAcceptableClient(clientChannel);
         logger.debug(clientChannel.toString());
