@@ -26,6 +26,7 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, AioCli
         if (result == null || result < 0) {
             client.destroy();
         }
+        client.readSysCall();
     }
 
     @Override

@@ -26,8 +26,11 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectableClientFactory {
+
+    private final AtomicInteger sequencedIdGenerator = new AtomicInteger();
 
     private final ClientContext connectableClientContext;
 
@@ -52,6 +55,6 @@ public class ConnectableClientFactory {
 
     public AioClient newConnectableClient() throws IOException {
         AsynchronousSocketChannel clientChannel = AsynchronousSocketChannel.open(connectableClientGroup);
-        return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true, connectCompletionHandler, readCompletionHandler, writeCompletionHandler);
+        return new AioClient(sequencedIdGenerator.incrementAndGet(), clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), true, connectCompletionHandler, readCompletionHandler, writeCompletionHandler);
     }
 }

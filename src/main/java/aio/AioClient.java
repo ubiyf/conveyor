@@ -30,6 +30,8 @@ public class AioClient {
 
     private final AsynchronousSocketChannel clientChannel;
 
+    private final int sequencedId;
+
     private ByteBuffer readBuffer;
 
     private ByteBuffer writeBuffer;
@@ -50,7 +52,8 @@ public class AioClient {
 
     private Object inputNetworkMessage;
 
-    public AioClient(AsynchronousSocketChannel clientChannel, Serializer serializer, ClientContext clientContext, boolean connectable, ConnectCompletionHandler connectCompletionHandler, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) {
+    public AioClient(int sequencedId, AsynchronousSocketChannel clientChannel, Serializer serializer, ClientContext clientContext, boolean connectable, ConnectCompletionHandler connectCompletionHandler, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) {
+        this.sequencedId = sequencedId;
         this.clientChannel = clientChannel;
         this.readBuffer = ByteBufferPool.getBufferFromPool();
         this.writeBuffer = ByteBufferPool.getBufferFromPool();
@@ -127,7 +130,6 @@ public class AioClient {
             inputNetworkMessage = serializer.toObject(readBuffer);
             clearReadBuffer();
         }
-        readSysCall();
         return  inputNetworkMessage;
     }
 
@@ -136,8 +138,7 @@ public class AioClient {
         serializer.toByte(writeBuffer, msg);
     }
 
-    @Override
-    public int hashCode() {
-        return clientChannel.hashCode();
+    public int getSequencedId() {
+        return sequencedId;
     }
 }

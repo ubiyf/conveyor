@@ -7,9 +7,8 @@ import serialization.KryoSerializer;
 import serialization.Serializer;
 
 import java.io.IOException;
-import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * Copyright 2014 Yang Fan.
@@ -28,6 +27,7 @@ import java.util.concurrent.Executors;
  */
 public class AcceptableClientFactory {
 
+    private final AtomicInteger sequencedIdGenerator = new AtomicInteger();
 
     private final ClientContext connectableClientContext;
 
@@ -45,7 +45,7 @@ public class AcceptableClientFactory {
     }
 
     public AioClient newAcceptableClient(AsynchronousSocketChannel clientChannel) {
-        return new AioClient(clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), false, null, readCompletionHandler, writeCompletionHandler);
+        return new AioClient(sequencedIdGenerator.incrementAndGet(), clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), false, null, readCompletionHandler, writeCompletionHandler);
     }
 
     public ReadCompletionHandler getReadCompletionHandler() {

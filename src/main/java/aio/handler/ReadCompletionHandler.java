@@ -59,9 +59,9 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, AioClie
             return;
         }
         client.getClientContext();
-        int hashCode = client.hashCode();
-        int index = hashCode % Runtime.getRuntime().availableProcessors();
-        logger.debug(hashCode + " " + index);
+        int sequencedId = client.getSequencedId();
+        int index = sequencedId % Runtime.getRuntime().availableProcessors();
+        logger.debug(sequencedId + " " + index);
         Disruptor<ComputeEvent> computeDisruptor = computeDisruptors.get(index);
         computeDisruptor.publishEvent(ComputeEventTranslator.getInstance(), client);
     }
