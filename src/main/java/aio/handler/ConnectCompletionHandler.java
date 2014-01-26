@@ -16,7 +16,6 @@ package aio.handler;
  */
 
 import aio.AioClient;
-import aio.context.ClientContext;
 
 import java.nio.channels.CompletionHandler;
 

@@ -24,10 +24,4 @@ public class LuaHash {
         return result;
     }
 
-    public static void main(String [] arg) {
-        System.out.println(ByteUtils.intToBytes(1));
-        System.out.println(ByteUtils.intToBytes(127));
-        System.out.println(ByteUtils.intToBytes(128));
-        System.out.println(ByteUtils.intToBytes(130));
-    }
 }

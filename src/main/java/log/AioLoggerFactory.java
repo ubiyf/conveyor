@@ -11,7 +11,7 @@ public class AioLoggerFactory implements ILoggerFactory {
 	ConcurrentMap<String, Logger> loggerMap;
 
 	public AioLoggerFactory() {
-		loggerMap = new ConcurrentHashMap<String, Logger>();
+		loggerMap = new ConcurrentHashMap<>();
 	}
 
 	@Override

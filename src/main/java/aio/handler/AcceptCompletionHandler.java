@@ -18,10 +18,8 @@ package aio.handler;
 import aio.AcceptableClientFactory;
 import aio.AioClient;
 import aio.context.AcceptContext;
-import aio.context.ClientContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import serialization.KryoSerializer;
 
 import java.io.IOException;
 import java.net.StandardSocketOptions;

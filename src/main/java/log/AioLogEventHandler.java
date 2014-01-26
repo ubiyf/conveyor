@@ -61,10 +61,6 @@ public class AioLogEventHandler implements EventHandler<AioLogEvent> {
         }
     }
 
-    public void setFileNamePrefix(String nPrefix) {
-        logFileNamePrefix = nPrefix;
-    }
-
     public void initLogFile() {
         logFileNum = 0;
         sizeRolling();

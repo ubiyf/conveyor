@@ -33,13 +33,12 @@ public class StringSerializer implements Serializer {
 
     @Override
     public Object toObject(ByteBuffer inBuffer) {
-        CharBuffer charBuffer = null;
+        CharBuffer charBuffer;
         try {
             inBuffer.flip();
             CharsetDecoder decoder = StringThreadLocal.getLocalDecoder();
             charBuffer = decoder.decode(inBuffer);
-            String s = charBuffer.toString();
-            return s;
+            return charBuffer.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

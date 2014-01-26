@@ -37,7 +37,7 @@ public class AcceptableClientFactory {
 
     private final WriteCompletionHandler writeCompletionHandler;
 
-    public AcceptableClientFactory(ClientContext connectableClientContext, Serializer serializer, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) throws IOException {
+    AcceptableClientFactory(ClientContext connectableClientContext, Serializer serializer, ReadCompletionHandler readCompletionHandler, WriteCompletionHandler writeCompletionHandler) throws IOException {
         this.connectableClientContext = connectableClientContext;
         this.serializer = serializer;
         this.readCompletionHandler = readCompletionHandler;
@@ -46,13 +46,5 @@ public class AcceptableClientFactory {
 
     public AioClient newAcceptableClient(AsynchronousSocketChannel clientChannel) {
         return new AioClient(sequencedIdGenerator.incrementAndGet(), clientChannel, serializer, KryoSerializer.getInstance().copy(connectableClientContext), false, null, readCompletionHandler, writeCompletionHandler);
-    }
-
-    public ReadCompletionHandler getReadCompletionHandler() {
-        return readCompletionHandler;
-    }
-
-    public WriteCompletionHandler getWriteCompletionHandler() {
-        return writeCompletionHandler;
     }
 }

@@ -77,6 +77,7 @@ public class AioClient {
      * Just tell OS that I want to read
      */
     public void readSysCall() {
+        read = false;
         clientChannel.read(readBuffer, this, readCompletionHandler);
     }
 
@@ -129,6 +130,7 @@ public class AioClient {
         if (!read) {
             inputNetworkMessage = serializer.toObject(readBuffer);
             clearReadBuffer();
+            read = true;
         }
         return  inputNetworkMessage;
     }

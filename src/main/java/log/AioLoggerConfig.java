@@ -55,11 +55,7 @@ public class AioLoggerConfig {
 	}
 	
 	private static boolean isBlankString(String str) {
-		if (null == str || "".equals(str)) {
-			return true;
-		} else {
-			return false;
-		}
+        return null == str || "".equals(str);
 	}
 
 	public static AioLoggerLevel getLevel() {
