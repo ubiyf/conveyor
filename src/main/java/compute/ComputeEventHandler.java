@@ -14,7 +14,8 @@ public class ComputeEventHandler implements EventHandler<ComputeEvent> {
 
     private Map<Class, NetworkMessageHandler> networkMessageHandlers = new ConcurrentHashMap<>();
 
-    private ComputeEventHandler() {}
+    private ComputeEventHandler() {
+    }
 
     public static ComputeEventHandler getInstance() {
         return INSTANCE;

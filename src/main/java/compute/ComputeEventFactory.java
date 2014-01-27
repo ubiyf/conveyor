@@ -21,7 +21,8 @@ public class ComputeEventFactory implements EventFactory<ComputeEvent> {
 
     private static final ComputeEventFactory INSTANCE = new ComputeEventFactory();
 
-    private ComputeEventFactory() {}
+    private ComputeEventFactory() {
+    }
 
     public static ComputeEventFactory getInstance() {
         return INSTANCE;

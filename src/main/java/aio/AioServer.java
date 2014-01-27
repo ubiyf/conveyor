@@ -19,6 +19,7 @@ import aio.context.AcceptContext;
 import aio.context.ClientContext;
 import aio.context.ServerContext;
 import aio.handler.AcceptCompletionHandler;
+import aio.handler.ConnectCompletionHandler;
 import aio.handler.ReadCompletionHandler;
 import aio.handler.WriteCompletionHandler;
 import compute.ComputeEventHandler;
@@ -146,18 +147,41 @@ public class AioServer {
         AioServer echoServer = new AioServer("test", 9999);
         echoServer.registerNetworkMessageHandler(String.class, new StringMessageEchoHandler());
         echoServer.start();
+        ConnectableClientFactory factory = new ConnectableClientFactory(null, StringSerializer.getInstance(), new EchoClientConnectCompletionHandler(), new ReadCompletionHandler(), new WriteCompletionHandler());
+        AioClient client = factory.newConnectableClient();
+        client.connectSysCall(new InetSocketAddress(IpUtils.getLocalAddress(), 9999));
         latch.await();
     }
 
     private static class StringMessageEchoHandler implements NetworkMessageHandler<String> {
 
+        private static AtomicInteger counter = new AtomicInteger();
+
         private final Logger logger = LoggerFactory.getLogger(StringMessageEchoHandler.class);
 
         @Override
         public void handle(String msg, AioClient client) {
-            logger.debug(msg);
+            int x  = counter.incrementAndGet();
+            if (x == 10000000) {
+                logger.debug("1kw");
+            }
             client.writeNetworkMessage(msg);
             client.writeSysCall();
+        }
+    }
+
+
+    private static class EchoClientConnectCompletionHandler implements ConnectCompletionHandler {
+
+        @Override
+        public void completed(Void result, AioClient client) {
+            client.writeNetworkMessage("hello");
+            client.writeSysCall();
+        }
+
+        @Override
+        public void failed(Throwable exc, AioClient client) {
+
         }
     }
 }

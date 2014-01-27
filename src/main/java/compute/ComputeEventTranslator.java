@@ -22,9 +22,10 @@ public class ComputeEventTranslator implements EventTranslatorOneArg<ComputeEven
 
     private static final ComputeEventTranslator INSTANCE = new ComputeEventTranslator();
 
-    private ComputeEventTranslator() {}
+    private ComputeEventTranslator() {
+    }
 
-    public static  ComputeEventTranslator getInstance() {
+    public static ComputeEventTranslator getInstance() {
         return INSTANCE;
     }
 

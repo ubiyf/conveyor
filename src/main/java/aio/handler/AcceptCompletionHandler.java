@@ -48,8 +48,9 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
     /**
      * Server is always passive, when accepts a new client
      * it will initiate a read system call and waiting for client action
+     *
      * @param clientChannel the socket channel connected to the remote client
-     * @param context the accept action context
+     * @param context       the accept action context
      */
     private void onNewClient(AsynchronousSocketChannel clientChannel, AcceptContext context) {
         try {

@@ -21,7 +21,8 @@ public class AioLogEventFactory implements EventFactory<AioLogEvent> {
 
     private static final AioLogEventFactory INSTANCE = new AioLogEventFactory();
 
-    private AioLogEventFactory() {}
+    private AioLogEventFactory() {
+    }
 
     public static AioLogEventFactory getInstance() {
         return INSTANCE;

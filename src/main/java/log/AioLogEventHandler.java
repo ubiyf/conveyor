@@ -109,7 +109,7 @@ public class AioLogEventHandler implements EventHandler<AioLogEvent> {
     }
 
     private void sizeRolling() {
-        logFileNum ++;
+        logFileNum++;
         sizeCounter = 0L;
 
         String fileName = getLogFileName();

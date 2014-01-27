@@ -132,7 +132,7 @@ public class AioClient {
             clearReadBuffer();
             read = true;
         }
-        return  inputNetworkMessage;
+        return inputNetworkMessage;
     }
 
     public void writeNetworkMessage(Object msg) {

@@ -19,7 +19,7 @@ public class LuaHash {
 
     public static long hash(int i) {
         long result = 0;
-        byte [] tmp = ByteUtils.intToBytes(i);
+        byte[] tmp = ByteUtils.intToBytes(i);
 
         return result;
     }

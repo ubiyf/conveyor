@@ -19,15 +19,9 @@ import aio.AioClient;
 
 import java.nio.channels.CompletionHandler;
 
-public class ConnectCompletionHandler implements CompletionHandler<Void, AioClient> {
+public interface ConnectCompletionHandler extends CompletionHandler<Void, AioClient> {
 
-    @Override
-    public void completed(Void result, AioClient attachment) {
+    public void completed(Void result, AioClient client);
 
-    }
-
-    @Override
-    public void failed(Throwable exc, AioClient attachment) {
-
-    }
+    public void failed(Throwable exc, AioClient client);
 }

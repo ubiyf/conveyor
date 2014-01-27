@@ -61,7 +61,6 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, AioClie
         client.getClientContext();
         int sequencedId = client.getSequencedId();
         int index = sequencedId % Runtime.getRuntime().availableProcessors();
-        logger.debug(sequencedId + " " + index);
         Disruptor<ComputeEvent> computeDisruptor = computeDisruptors.get(index);
         computeDisruptor.publishEvent(ComputeEventTranslator.getInstance(), client);
     }
